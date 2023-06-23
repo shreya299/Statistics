@@ -1,0 +1,154 @@
+"
+****************************************************************
+Name:Sai Shreya Challa
+Student Number:A00264982
+
+QMM1002 Module 10 Applied Activity
+****************************************************************
+"
+
+"
+#############	
+#Question #1
+1.	(17 marks) The “ATTMonthlyReturn.csv” file gives the monthly returns for AT&T for 7
+years. Suppose you work as an analyst for AT&T and your task is to forecast the next
+month’s return.
+a.	(1 mark) Create a ts() object for the AT&T Data.
+b.	(3 marks) Plot the decomposition of the time series and comment on each of the four
+components of a time series.
+c.	(3 marks) Fit an MA-5, MA-12, and another MA model that you choose to the time series.
+d.	(2 marks) What is the forecast for the next month, January 1968, using all three moving
+average models? Do you predict that AT&T will exhibit a positive or negative return?
+e.	(4 marks) Plot the three smoothed models along with the original time series in one labelled
+plot. Give each series a different color and include a legend.
+f.	(4 marks) For all of the moving average models compute the MSE, MAD/MAE, and MAPE.
+Which model would you recommend?
+#############	
+"
+attdat<-read.csv(file.choose("ATTMonthlyReturn.csv"), header=TRUE)#read the data
+
+#ts() object for the AT&T Data
+(att.ts<-ts(attdat[,-1], start=c(1961,1), frequency = 12)) #[,-1] means remove first column 
+
+"           Jan       Feb       Mar       Apr       May       Jun       Jul       Aug       Sep       Oct
+1961  0.073510 -0.002170  0.074300  0.016550 -0.007120 -0.034630  0.064170 -0.015880 -0.010290  0.007280
+1962 -0.059690  0.045120 -0.029160 -0.038760 -0.079440 -0.083890  0.079520  0.014730 -0.058760  0.028270
+1963  0.036400 -0.011160  0.020000  0.030960 -0.007810 -0.019310 -0.006220  0.044000  0.029180  0.043990
+1964  0.039500 -0.007260 -0.012440  0.011700 -0.008900  0.063290 -0.023810 -0.017420 -0.016070 -0.010890
+1965 -0.007330  0.005540 -0.018480  0.026370  0.033030 -0.035780 -0.009280  0.009360  0.009350 -0.024070
+1966 -0.018520  0.011320 -0.058580  0.006670 -0.027810  0.009170 -0.013640 -0.040550 -0.004850  0.100000
+1967  0.052270  0.011660  0.034480 -0.012500 -0.062450  0.036360 -0.085530 -0.015830  0.022170 -0.024100
+           Nov       Dec
+1961  0.096180  0.032230
+1962  0.058650  0.018540
+1963  0.049810  0.000001
+1964 -0.031190  0.041980
+1965 -0.058060 -0.012200
+1966 -0.039020  0.025640
+1967  0.004440  0.002490"
+
+#decomposition of the time series
+(att_decomp <- decompose(att.ts))
+
+# Plot the components
+plot(att_decomp)
+
+"Four components:
+Trend: The trend component represents the long-term movement or direction of the series. 
+In this case, the trend appears to be relatively stable with some fluctuations over the years.
+Seasonality: The seasonality component represents any regular pattern or seasonality in the data.
+In the plot, we can observe some periodicity in the series, suggesting the presence of seasonal effects.
+Random: The random component, also known as the residual or error component, represents the random 
+fluctuations or noise in the data that cannot be explained by the trend or seasonality. It 
+appears as the deviations from the trend and seasonality in the plot.
+Observed: The observed component represents the original time series without any decomposition.
+It is the sum of the trend, seasonality, and random components."
+
+
+install.packages("TTR")
+library(TTR)
+
+# MA-5, MA-12, and another MA model that i choose to the time series:M-15
+(att.ma5<-SMA(att.ts, n=5)) #n=5 is the length of the moving average
+(att.ma12<-SMA(att.ts, n=12)) #n=12 is the length of the moving average
+(att.ma15<-SMA(att.ts, n=15)) #n=15 is the length of the moving average
+
+#Forecasts for the next period - January 1968
+att.ma5[length(att.ma5)] #-0.002166
+att.ma12[length(att.ma12)]#-0.003045
+att.ma15[length(att.ma15)]#0.003338667
+(forecast <- (att.ma5[length(att.ma5)] + att.ma12[length(att.ma12)] + att.ma15[length(att.ma15)]) / 3)
+#-0.0006241111
+#Based on these forecasts, the predicted returns for January 1968 are negative.
+
+plot.ts(cbind(att.ts, att.ma5, att.ma12, att.ma15), 
+        plot.type="single", 
+        col=c("black", "red", "blue", "green"), 
+        ylab="Returns", 
+        main="Monthly returns")
+legend("bottomright", legend=c("Data", "MA-5", "MA-12", "MA-15"), 
+       col=c("black", "red", "blue", "green"), lty=1, cex=0.5)
+
+ERRORS<-function(data, L){
+  ma.data<-SMA(data, n=L)
+  error<-NULL
+  for (i in 1:length(data)-L){
+    error[i]<-data[i+L]-ma.data[i+L-1]
+  }
+  error.p<-NULL
+  for(i in 1:length(data)-L){
+    error.p[i]<-abs(data[i+L]-ma.data[i+L-1])/abs(data[i+L])
+  }
+  MSE<-mean(error^2)
+  MAD<-mean(abs(error))
+  MAPE<-mean(error.p)*100
+  error.df<-data.frame(errors=c(MSE, MAD, MAPE), row.names=c("MSE", "MAD", "MAPE"))
+  return(error.df)
+}
+
+att.errors<-cbind(ERRORS(att.ts, 5), ERRORS(att.ts, 12), ERRORS(att.ts, 15))
+options(scipen=999)
+colnames(att.errors)<-c("MA-5", "MA-12", "MA-15")
+att.errors
+"                MA-5           MA-12           MA-15
+MSE      0.001720658     0.001603339     0.001518094
+MAD      0.032505894     0.032564171     0.031093171
+MAPE 40834.732053539 26557.395748685 24901.059794453"
+#Based on these metrics, the recommended model would be the one with the lowest MSE, MAD/MAE, and MAPE values.
+#seems like MA-15 model is the best model.
+
+"2.	(5 marks) Case Study 2 Check Point In order to create time series models for your
+personalized study data, you must get the data into the correct format. Prepare your data using
+the given steps at the end of the 10.2 Moving Averages R script from class or in the “Preparing
+Your Time Series Data for Case 2” section of Lesson 10.2: Moving Average Models. You will
+replicate the code with your personalized data and with a chosen length for a moving average
+model. You must submit your personalized data .csv so I can run the code.
+Warning: some students do not have their dates stored correctly in their personalized data .csv
+files, these will need to be corrected or the code will not run.
+"
+
+library(zoo)
+
+library(forecast)
+
+library(TTR)
+#personalized Data 
+data <- read.csv(file.choose(), header = TRUE)
+data$Date <- as.Date(data$Date,format="%m/%d/%Y")  #format!
+data.zoo <- zoo(data[,3],data[,1]) #remove all columns except study time and set dates to index
+data.all <- merge(data.zoo,zoo(,seq(start(data.zoo),end(data.zoo),by="day")), all=TRUE) #include all missing dates
+
+#time series with the longest stretch of dates
+data.ts<-ts(na.contiguous(data.all))
+plot.ts(data.ts, xlab="Days since October 31, 2022", ylab="Hours Studied", main="Time Series Plot")
+
+#Assign any value to the length of the moving average below
+L<-10
+data.maL<-SMA(data.ts, L)
+
+#plot
+plot.ts(cbind(data.ts, data.maL), plot.type="single", col=c("green", "red"), 
+        xlab="Days since October 31, 2022", ylab="Hours Studied", main="My Personalized Study Data")
+legend("topright", legend=c("Data", "MA"), col=c("green", "red"), lty=1)
+
+
