@@ -1,0 +1,337 @@
+---
+title: "QMM1002 Case Study  1 [20%]"
+author:
+- Sai Shreya Challa
+- A00264982
+date: 'Due: February 24, 2022 at 11:59PM'
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+extra_dependencies: xcolor
+---
+
+## Introduction
+
+In this report, I gathered information on my daily routines in an Excel file in CSV format from October 31, 2022, to April 24th,2023, to develop a customized data set for this case study from semester one until now to learn more about my lifestyle. Here, I want to see if my conclusions align with how I use my time. My personalized data set comprises ten variables based on which I gathered my daily activities and habits and the daily patterns and trends I follow. These variables are either categorical or quantitative in type.
+
+The ten variables I have collected from semester one till now are the following:
+
+
+Variable | Type | Explanation 
+------------- | ------------- | -------------
+Date | Identifier | Date the data is collected
+Zoom Class  | Quantitative | Date the data is collected
+Hours Spent Studying  | Quantitative | The number of hours I spent studying 
+Hours Spent Sleeping  | Quantitative | The number of hours I slept on a particular day
+Coffee Cups | Quantitative | Coffee intake in a day
+News | Categorical | Did I watch the news or not in a day
+Part time work| Categorical | Part-time work (Yes, No)
+Productivity (Low-Medium-High)  | Categorical | Productivity level(Low, Medium, High)
+Number of songs listened to| Quantitative | The number of songs listened to (numbers 1, 2,.etc. ;)
+Term (S23 or W22) | Categorical | Which term is it?
+
+The variables that will be analyzed are hours spent studying, hours spent sleeping, and Number of songs listened to.
+
+I would like to understand and analyze the dataset in order to be able to understand these questions and be answered
+
+a.	What do I do in a day?
+
+b.	Do i spend my days how i expect?
+
+c.	Is there any difference in how I spend my time this semester compared to last semester?
+
+
+**Summary Statistics**
+
+```{r echo=FALSE}
+data<-read.csv(file.choose("Challa, Sai Shreya Personalized Data (3) (1)"), header=TRUE)
+data.3vars<-subset(data, select=c("Hours.spent.studying", "Hours.spent.sleeping", "Number.of.songs.listened.to"))
+print('Summary Statistics and Calculating Standard deviations:')
+summary(data.3vars)
+sd(data.3vars$Hours.spent.studying)
+sd(data.3vars$Hours.spent.sleeping)
+sd(data.3vars$Number.of.songs.listened.to)
+```
+Summary statistics for hours spent studying, hours spent sleeping, and Number of songs listened to in a day are:
+
+Variable | Mean | Standard deviation 
+------------- | ------------- | -------------
+Hours spent studying | 1.858 | 1.066232
+Hours spent sleeping | 5.869 | 1.547337
+Quantitative variable (variable 9:Number of songs listened to) | 8.824 |  4.192197
+
+**Conditions of t-distribution**
+
+Before beginning the analysis,I checked if the four conditions required for using the t-distribution are met for each variable. These conditions are:
+
+1.Independence: Observations should be independent of each other.
+
+2.Normality: The population from which the sample is taken should be approximately normally distributed or the sample size should be large enough (n>30) to rely on the Central Limit Theorem (CLT).
+
+3.Randomness: The sample should be selected randomly from the population.
+
+4.Sample Size: The sample size should be sufficiently large (n>30) or the data should be approximately normally distributed.
+
+**Conditions For Hours spent studying:**
+
+1.Random sampling: The data was collected using random sampling of personal observations and can be not accurate too so the condition is satisfied.
+
+2.Normality: The normality of the data is observed through histogram and box plot as below
+
+```{r echo=FALSE}
+#Show output only
+hist(data$Hours.spent.studying, xlab="Study Hours", main="Hours of study Each Day")
+boxplot(data$Hours.spent.studying, ylab="Study Hours", main="Hours of study Each Day")
+```
+
+The data shows a slightly skewed but roughly symmetric distribution which satisfies the normal condition.
+
+3.Independence: The hours spent studying on one day is not related to the hours spent studying on another day.
+
+4.Sample size: The sample size is sufficiently large (n>30)
+
+**Conditions For Hours spent sleeping**
+
+1.Random sampling: The data was collected using random sampling of personal observations and can be not accurate too so the condition is satisfied.
+
+2.Normality: The normality of the data is observed through histogram and box plot as below
+
+```{r echo=FALSE}
+#Show output only
+hist(data$Hours.spent.sleeping, xlab="Sleep Hours", main="Hours of sleep Each Day")
+boxplot(data$Hours.spent.sleeping, ylab="Sleep Hours", main="Hours of sleep Each Day")
+```
+
+The data is very slightly skewed but is symmetrical almost so it satisfies the normal condition.
+
+3.Independence: The hours spent sleeping on one day is not related to the sleeping hours on another day.
+
+4.Sample size: The sample size is sufficiently large (n>30)
+
+**For Music listened to each day:**
+
+1.Random sampling: The data was collected using random sampling of personal observations and can be not accurate too so the condition is satisfied.
+
+2.Normality: The normality of the data is observed through histogram and box plot as below
+
+
+```{r echo=FALSE}
+#Show output only
+hist(data$Number.of.songs.listened.to, xlab="Songs listened", main="Listening music Each Day")
+boxplot(data$Number.of.songs.listened.to, ylab="Songs listened", main="Listening music Each Day")
+```
+
+The data is roughly symmetrical which satisfies the normal condition.
+
+3.Independence: The frequency of listening to music is independent to one another
+
+4.Sample size: The sample size is sufficiently large (n>30)
+
+
+## Data Analysis
+
+### Part 1: Confidence Intervals
+
+**To determine the 95% confidence interval for the mean number of hours spent studying per day.**
+
+```{r include=FALSE}
+#the confidence interval for study hours
+s.conf<-t.test(data$Hours.spent.studying, conf.level = 0.95)
+```
+
+The 95% confidence interval that i spent time studying is between `r s.conf$conf.int` hours.
+
+Example of a daily activity: I can use this information to reflect on my study habits and evaluate whether I need to increase or decrease the number of hours I spend studying each day.
+
+
+**To determine the 95% confidence interval for the mean number of hours spent sleeping per day.** 
+
+```{r include=FALSE}
+#the confidence interval for sleeping
+sl.conf<-t.test(data$Hours.spent.sleeping, conf.level = 0.95)
+```
+The 95% confidence interval that i spent time sleeping is between `r sl.conf$conf.int` hours.
+
+Example of a daily activity: I can use this information to evaluate whether I am getting enough sleep each night and adjust my sleeping habits accordingly.I can also use this to avoid things that are making sleep time get affected.
+
+
+**To determine the 95% confidence interval for the mean number of songs listened to every day.**
+
+```{r include=FALSE}
+#confidence interval for songs
+so.conf<-t.test(data$Number.of.songs.listened.to, conf.level = 0.95)
+```
+The 95% confidence interval that the average frequency that i listened to songs is between `r so.conf$conf.int` songs .
+
+Example of a daily activity:  I can use this information to evaluate whether I am productive or not as i like to listen to songs while working on my personal study time and other times such as taking a walk or to relax.
+
+### Part 2: One-Sample Hypothesis Tests
+
+**One-sample t-test for hours spent studying**
+
+I wanted to test the hypothesis that my mean number of hours studied is greater than 3.13 hours per day, which is the average number of hours spent per day by McGill University students according to MacLean's.
+
+Null hypothesis:I study for less than or equal to 3.13 hours
+
+
+$H_0: \mu <= 3.13$
+
+Alternative hypothesis:I study for more than 3.13 hours
+
+$H_A: \mu >3.13$
+
+```{r include=FALSE}
+#Hide all output but extract the confidence interval from this in the interpretation below
+(s.test<-t.test(data$Hours.spent.studying, alternative="greater", mu = 3.13))
+```
+
+The p-value from performing the test at $\alpha = 0.05$ is `r s.test$p.value`.
+
+we don’t reject the null hypothesis as p-value `r s.test$p.value` is greater than $\alpha = 0.05$ and conclude that there is evidence suggesting that the mean number of hours studied is less than 3.13 hours per day.
+ 
+Based on this test, I am studying less than the average McGill University student. It helps me understand that I should evaluate my study habits and make adjustments as necessary to ensure that I meet my academic goals and study as per the expectations.
+
+**One-sample t-test for hours spent sleeping**
+
+Testing the hypothesis that mean number of hours spent sleeping per day is not equal to a specific value assuming 5 as a specific number of hours
+
+Null hypothesis:The mean numbers of hours i spent sleeping per day is equal to 5
+
+
+$H_0: \mu = 5$
+
+Alternative hypothesis:The mean numbers of hours i spent sleeping per day is not equal to 5 hours
+
+$H_A: \mu \neq 5$
+
+```{r include=FALSE}
+#Hide all output but extract the confidence interval from this in the interpretation below
+(sl.test<-t.test(data$Hours.spent.sleeping, alternative="two.sided", mu=5))
+```
+
+The p-value from performing the test at $\alpha = 0.05$ is `r sl.test$p.value`.
+
+
+Rejects the null hypothesis since p-value `r sl.test$p.value` is less than alpha value of 0.05.
+ 
+I can conclude that there is evidence to suggest that mean number of hours spent sleeping per day is different from a specific value assuming 5 as a specific number of hours
+ 
+Based on this test, I must improve my sleep habits much more and avoid getting distracted by other things and thoughts instead of sleeping and getting proper sleep hours.
+
+
+**One-sample t-test for frequency Listening to music**
+
+Testing the hypothesis that mean number of songs i listen to per day is not equal to a specific value assuming 11 as a specific number of hours
+
+Null hypothesis:The mean numbers of songs i listen to per day is equal to 11
+
+
+$H_0: \mu = 11$
+
+Alternative hypothesis:The mean numbers of songs i listen to per day is not equal to 11
+
+$H_A: \mu \neq 11$
+
+```{r include=FALSE}
+#Hide all output but extract the confidence interval from this in the interpretation below
+(m.test<-t.test(data$Number.of.songs.listened.to, alternative="two.sided", mu=11))
+```
+
+The p-value from performing the test at $\alpha = 0.05$ is `r m.test$p.value`.
+
+
+Rejects the null hypothesis since p-value `r m.test$p.value` is less than alpha value of 0.05.
+ 
+I can conclude that there is evidence to suggest that mean number of songs i listen to per day is different from a specific value assuming 11 as a specific number of songs
+ 
+Based on this test, It seems I have to listen to more songs because i am usually more productive while i am listening to music and i also listen to songs to relax and get a break which would relieve my stress.
+
+
+### Part 3: Two-Sample Hypothesis Tests
+
+I have created two subsets for semester one(W22) and semester two (S23) by having only hours spent studying with the particular term 
+
+```{r include=FALSE}
+#create subsets by term
+sWinter<-subset(data, Term=="W22", select="Hours.spent.studying")
+sSpring<-subset(data, Term=="S23", select="Hours.spent.studying")
+```
+
+**Independent groups assumption**
+It means that no two observations in a data set are related to each other or affect each other in any way.We can check the two subsets and can check that the data differs by the date identifier and they do not affect other subset in any way.
+
+So the condition for the independent groups is satisfied.
+
+I created a random sample of 10 days from each subset of semesters and created new variables in order to test respective hypothesis
+
+```{r include=FALSE}
+sWinter3.2<-sample(sWinter$Hours.spent.studying, 10)
+sSpring3.2<-sample(sSpring$Hours.spent.studying, 10)
+```
+
+**Test the hypothesis that you spent more time studying per day during semester 1 than semester 2.** 
+
+Null hypothesis:The mean study time during Semester 1(w22) is less than or equal to the mean study time during Semester 2(s23)
+
+
+$H_0: \mu w - \mu s <= 0$
+
+Alternative hypothesis:The mean study time during Semester 1(w22) is greater than the mean study time during Semester 2(s23)
+
+$H_A: \mu w - \mu s > 0$
+
+where muw and mus are the population means of hours spent studying per day during semester 1 and semester 2, respectively.
+
+Since we have two independent groups and we want to compare the means between them, we will use a two-sample t-test assuming unequal variances (also known as Welch's t-test) at the 0.05 level of significance.
+
+```{r include=FALSE}
+(ss.test<-t.test(sSpring3.2,sWinter3.2,alternative="greater", mu=0,var.equal = FALSE,paired = FALSE))
+```
+The p-value from performing the test at $\alpha = 0.05$ is `r ss.test$p.value`.
+
+we don’t reject the null hypothesis as p-value `r ss.test$p.value` is greater than $\alpha = 0.05$ and conclude that there is insufficient evidence to suggest that the mean number of hours spent studying per day during semester 1 is greater than semester 2.
+ 
+Based on this test, I have studied more per day in semester 2 than in semester 1 and improved my schedule a bit.However, It helps me understand that I should evaluate my study habits and make adjustments as necessary to ensure that I meet my academic goals and study as per the expectations.
+
+I selected the first 10 days from each subset and created new variables in order to test respective hypothesis
+
+```{r include=FALSE}
+sWinter3.3<-sWinter[1:10,1]
+sSpring3.3<-sSpring[1:10,1]
+```
+**Test the hypothesis that you spent more time studying per day during semester 1 than semester 2. **
+
+Null hypothesis:The mean difference of study time  per day during Semester 1(w22) is equal or less than
+than the mean study time during Semester 2(s23)
+
+$H_0: \mu w <= \mu s$
+
+Alternative hypothesis:The mean study time during Semester 1(w22) per day is greater than the mean study time during Semester 2(s23)
+
+$H_A: \mu w > \mu s$
+
+where muw and mus are the population means of hours spent studying per day during semester 1 and semester 2, respectively.
+
+Since we have to test studying per day which makes this a paired or having dependent samples and we want to compare the means between them, we will use a paired t-test assuming unequal variances (also known as Welch's t-test) at the 0.05 level of significance.
+
+```{r include=FALSE}
+(ss1.test<-t.test(sSpring3.3,sWinter3.3,alternative="greater", mu=0,var.equal = FALSE,paired = TRUE))
+```
+The p-value from performing the test at $\alpha = 0.05$ is `r ss1.test$p.value`.
+
+we don’t reject the null hypothesis as p-value `r ss1.test$p.value` is greater than $\alpha = 0.05$ and conclude that there is insufficient evidence to suggest that i spent more time studying per day during semester 1 than semester 2.
+ 
+Based on this test, I have studied per day less in semester 1 than in semester 2 and improved my schedule a bit.However, It helps me understand that I should evaluate my study habits and make adjustments as necessary to ensure that I meet my academic goals and study as per the expectations.
+
+
+## Conclusion
+
+From the data analysis,I understood that i am trying to improve my study schedule but my sleep schedule is required attention and I have to divide my tasks equally between study,part time and improving my productivity but also relax along by listening to music or doing something i like in between.
+
+It is helpful in helping me understand that I don't exactly spend my days as I'm trying to vision them and need to implement more strict schedule with regards to my work-study-life balance.
+
+There is a slight difference that i observed that i am trying to spend more time towards my study than i did in the semester 1 which is really important so that i can develop my skills and be more productive.
+
+I learned about my schedule of sleep and study along with the frequency of songs i listen to make myself more productive and active towards tasks.It is really helpful in trying to inculcate changes in my daily habits and bring a more positive change in life so that i can improve well.I will keep track of my schedule and try to be more organized in following my plan of handling my studies and working to create a more balanced structure.
+
